@@ -1,3 +1,4 @@
+import axios from "axios";
 import { defineStore } from "pinia";
 
 export const usePostStore = defineStore("post", {
@@ -13,7 +14,13 @@ export const usePostStore = defineStore("post", {
         getPosts() {},
         getPost() {},
         storePost() {
-            console.log(this.title, this.description);
+            let formData = {
+                title: this.title,
+                description: this.description,
+            };
+            axios.post("/api/posts", formData).then((response) => {
+                console.log(response.data);
+            });
         },
         updatePost() {},
     },
