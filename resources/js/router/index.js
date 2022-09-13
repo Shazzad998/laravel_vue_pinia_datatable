@@ -9,6 +9,7 @@ import Modals from "../pages/Modals.vue";
 import Login from "../pages/Login.vue";
 import Register from "../pages/Register.vue";
 import ForgotPassword from "../pages/ForgotPassword.vue";
+import Posts from "../pages/Posts.vue";
 
 import AuthLayout from "../layouts/AuthLayout.vue";
 import DefaultLayout from "../layouts/DefaultLayout.vue";
@@ -19,6 +20,11 @@ const routes = [
         redirect: "/dashboard",
         component: AuthLayout,
         children: [
+            {
+                path: "/posts-index",
+                component: Posts,
+                name: "posts.index",
+            },
             {
                 path: "/dashboard",
                 component: Dashboard,
