@@ -32,8 +32,7 @@
                         <tr
                             class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800"
                         >
-                            <th class="px-4 py-3">Client</th>
-                            <th class="px-4 py-3">Amount</th>
+                            <th class="px-4 py-3">Post</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3">Date</th>
                             <th class="px-4 py-3">Actions</th>
@@ -42,48 +41,62 @@
                     <tbody
                         class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800"
                     >
-                        <tr class="text-gray-700 dark:text-gray-400">
+                        <tr
+                            class="text-gray-700 dark:text-gray-400"
+                            v-for="post in posts.data"
+                            :key="post.id"
+                        >
                             <td class="px-4 py-3">
                                 <div class="flex items-center text-sm">
                                     <!-- Avatar with inset shadow -->
                                     <div
-                                        class="relative hidden w-8 h-8 mr-3 rounded-full md:block"
+                                        class="relative hidden w-24 h-20 mr-3 rounded-full md:block"
                                     >
                                         <img
-                                            class="object-cover w-full h-full rounded-full"
+                                            class="object-cover w-full h-full rounded"
                                             src="https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjE3Nzg0fQ"
                                             alt=""
                                             loading="lazy"
                                         />
-                                        <div
-                                            class="absolute inset-0 rounded-full shadow-inner"
-                                            aria-hidden="true"
-                                        ></div>
                                     </div>
-                                    <div>
-                                        <p class="font-semibold">Hans Burger</p>
+                                    <div class="">
+                                        <p class="font-semibold">
+                                            {{ post.title }}
+                                        </p>
                                         <p
                                             class="text-xs text-gray-600 dark:text-gray-400"
                                         >
-                                            10x Developer
+                                            {{ post.description }}
                                         </p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-sm">$ 863.45</td>
+
                             <td class="px-4 py-3 text-xs">
                                 <span
-                                    class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100"
+                                    class="px-2 py-1 font-semibold leading-tight rounded-full"
+                                    :class="[
+                                        post.is_published
+                                            ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100'
+                                            : 'text-yellow-700 bg-yellow-300 dark:bg-yellow-500 dark:text-yellow-100',
+                                    ]"
                                 >
-                                    Approved
+                                    {{
+                                        post.is_published
+                                            ? "Published"
+                                            : "Draft"
+                                    }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-sm">6/10/2020</td>
+                            <td class="px-4 py-3 text-sm">
+                                {{ post.created_at }}
+                            </td>
                             <td class="px-4 py-3">
                                 <div
                                     class="flex items-center space-x-4 text-sm"
                                 >
                                     <button
+                                        @click="editPost(post.id)"
                                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                                         aria-label="Edit"
                                     >
@@ -291,6 +304,26 @@
                         type="file"
                     />
                 </label>
+
+                <div class="block mt-4 text-sm">
+                    <span class="text-gray-700 dark:text-gray-400 block"
+                        >Publish
+                    </span>
+                    <label
+                        for="purple-toggle"
+                        class="inline-block relative items-center mr-5 cursor-pointer mt-2"
+                    >
+                        <input
+                            type="checkbox"
+                            v-model="is_published"
+                            id="purple-toggle"
+                            class="sr-only peer"
+                        />
+                        <div
+                            class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-2 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"
+                        ></div>
+                    </label>
+                </div>
             </div>
             <footer
                 class="flex flex-col items-center justify-end px-6 py-3 -mx-6 -mb-4 space-y-4 sm:space-y-0 sm:space-x-3 sm:flex-row bg-gray-50 dark:bg-gray-800"
@@ -314,19 +347,16 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { usePostStore } from "@/store/PostStore";
 
-const { posts, title, description } = storeToRefs(usePostStore());
-const { storePost } = usePostStore();
+const { isModalOpen, posts, title, description, is_published } = storeToRefs(
+    usePostStore()
+);
+const { openModal, closeModal, storePost, getPosts, editPost } = usePostStore();
 
-const isModalOpen = ref(false);
-function openModal() {
-    isModalOpen.value = true;
-}
-
-function closeModal() {
-    isModalOpen.value = false;
-}
+onMounted(async () => {
+    getPosts();
+});
 </script>
