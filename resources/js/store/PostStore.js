@@ -4,9 +4,12 @@ import { defineStore } from "pinia";
 export const usePostStore = defineStore("post", {
     state: () => ({
         isModalOpen: false,
+        isDeleteModalOpen: false,
+        dataId: null,
         posts: [],
         title: null,
         description: null,
+        image: null,
         is_published: false,
     }),
 
@@ -20,16 +23,26 @@ export const usePostStore = defineStore("post", {
                 console.log(error);
             }
         },
-        getPost() {},
+        getPost(id) {},
+
+        changeImage(event) {
+            this.image = event.target.files[0];
+        },
         storePost() {
-            let formData = {
-                title: this.title,
-                description: this.description,
-                is_published: this.is_published,
+            let formData = new FormData();
+            formData.append("title", this.title);
+            formData.append("description", this.description);
+            formData.append("image", this.image);
+            formData.append("is_published", this.is_published);
+            let config = {
+                header: {
+                    "Content-Type": "image/png",
+                },
             };
-            axios.post("/api/posts", formData).then((response) => {
+            axios.post("/api/posts", formData, config).then((response) => {
                 console.log(response.data);
                 this.closeModal();
+                this.getPosts();
             });
         },
 
@@ -40,14 +53,37 @@ export const usePostStore = defineStore("post", {
                 this.description = response.data.description;
                 this.is_published =
                     response.data.is_published == 1 ? true : false;
+                this.dataId = id;
                 this.openModal();
-
-                console.log(this.is_published);
             } catch (error) {
                 console.log(error);
             }
         },
-        updatePost() {},
+        updatePost(id) {
+            let formData = new FormData();
+            formData.append("title", this.title);
+            formData.append("description", this.description);
+            formData.append("image", this.image);
+            formData.append("is_published", this.is_published);
+            formData.append("_method", "put");
+            let config = {
+                header: {
+                    "Content-Type": "image/png",
+                },
+            };
+
+            axios.post("/api/posts/" + id, formData, config).then(() => {
+                this.getPosts();
+                this.closeModal();
+            });
+        },
+
+        deletePost(id) {
+            axios.delete("/api/posts/" + id).then(() => {
+                this.getPosts();
+                this.closeDeleteModal();
+            });
+        },
 
         openModal() {
             this.isModalOpen = true;
@@ -55,6 +91,20 @@ export const usePostStore = defineStore("post", {
 
         closeModal() {
             this.isModalOpen = false;
+            this.dataId = null;
+            this.title = null;
+            this.description = null;
+            this.is_published = false;
+        },
+
+        openDeleteModal(id) {
+            this.isDeleteModalOpen = true;
+            this.dataId = id;
+        },
+
+        closeDeleteModal() {
+            this.isDeleteModalOpen = false;
+            this.dataId = null;
         },
     },
 });
