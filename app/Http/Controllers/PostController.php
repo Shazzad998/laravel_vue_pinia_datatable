@@ -25,7 +25,7 @@ class PostController extends Controller
         $image_path = '';
         $file = $request->file('image');
         if ($file) {
-            $image_name = date('Y-m-d H-i-s') . "-" . $request->title . "." . $file->getClientOriginalExtension();
+            $image_name = date('YmdHis') . "-" . $request->title . "." . $file->getClientOriginalExtension();
             $file->move(public_path('images/posts'), $image_name);
             $image_path = 'images/posts/' . $image_name;
         }
@@ -56,7 +56,7 @@ class PostController extends Controller
         $file = $request->file('image');
         if ($file) {
 
-            $image_name = date('Y-m-d H-i-s') . "-" . $request->title . "." . $file->getClientOriginalExtension();
+            $image_name = date('YmdHis') . "-" . $request->title . "." . $file->getClientOriginalExtension();
             $file->move(public_path('images/posts'), $image_name);
 
             if (is_file(public_path($image_path))) {
