@@ -17,9 +17,9 @@ export const usePostStore = defineStore("post", {
 
     getters: {},
     actions: {
-        async getPosts() {
+        async getPosts(page = 1) {
             try {
-                let response = await axios.get("/api/posts");
+                let response = await axios.get("/api/posts?page=" + page);
                 this.posts = response.data;
             } catch (error) {
                 console.log(error);
@@ -28,7 +28,7 @@ export const usePostStore = defineStore("post", {
         async getPost(id) {
             try {
                 let response = await axios.get("/api/posts/" + id);
-                this.post = response.data;
+                this.post = response.data.data;
                 this.openShowModal();
             } catch (error) {
                 console.log(error);
