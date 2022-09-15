@@ -4,9 +4,11 @@ import { defineStore } from "pinia";
 export const usePostStore = defineStore("post", {
     state: () => ({
         isModalOpen: false,
+        isShowModalOpen: false,
         isDeleteModalOpen: false,
         dataId: null,
         posts: [],
+        post: {},
         title: null,
         description: null,
         image: null,
@@ -23,7 +25,15 @@ export const usePostStore = defineStore("post", {
                 console.log(error);
             }
         },
-        getPost(id) {},
+        async getPost(id) {
+            try {
+                let response = await axios.get("/api/posts/" + id);
+                this.post = response.data;
+                this.openShowModal();
+            } catch (error) {
+                console.log(error);
+            }
+        },
 
         changeImage(event) {
             this.image = event.target.files[0];
@@ -105,6 +115,14 @@ export const usePostStore = defineStore("post", {
         closeDeleteModal() {
             this.isDeleteModalOpen = false;
             this.dataId = null;
+        },
+
+        openShowModal() {
+            this.isShowModalOpen = true;
+        },
+
+        closeShowModal() {
+            this.isShowModalOpen = false;
         },
     },
 });
